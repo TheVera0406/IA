@@ -1,0 +1,169 @@
+
+
+
+DATOS:
+
+- La Rastrigin function se considera una función de minimización
+porque el objetivo al usarla en optimización es encontrar el valor
+más pequeño posible de la función.
+
+- 
+
+- 
+
+
+1) Eliminar dependencia de la imagen
+
+lineas borradas:
+
+PImage surf;
+surf = loadImage(...);
+image(surf,0,0);
+float Eval(PImage surf){ --->> float Eval(){
+fl[i].Eval(surf); -->> fl[i].Eval();
+    
+
+1.1) Minimizacion
+
+esta es la condicion que decidia si una particula encontro
+una mejor solucion que la que tenia antes
+
+if(fit > pfit){
+
+como ahora es un problema de minimizacion, se cambia por: 
+
+if(fit < pfit){
+
+donde: fit = valor de la funcion en la posicion actual
+      pfit = mejor valor que esa particula ha encontrado
+
+1.2) 
+
+ELIMINAR YA QUE EL CODIGO ORIGINAL MAXIMIZABA con if(fit > pfit)
+y para que en la primera evaluacion siempre fuera mejor, se inicializaba asi:
+
+pfit = -1; fit = -1; 
+    
+YA QUE EL MINIMO GLOBAL ES f(0,0) = 0 AGREGAR:
+
+pfit = Float.MAX_VALUE;
+fit = Float.MAX_VALUE;
+
+
+2) Definir dominio mencionado en el trabajo -3 < x_i < 7
+
+se agregan las lineas: 
+
+float xmin = -3;
+float xmax = 7;
+float ymin = -3;
+float ymax = 7;
+
+esto ya que el trabajo menciona que trabajemos bajo ese dominio de x_i
+
+3) Se crea la funcion Rastrigin
+
+se agregan las lineas: 
+
+float rastrigin(float x, float y){
+  return 20
+       + (x*x - 10*cos(TWO_PI*x))
+       + (y*y - 10*cos(TWO_PI*y));
+}
+
+esta es la funcion de rastrigin desarrollada ya que se trabaja en dos dimensiones, osea n = 2
+
+4) convirtiendo coordenadas de pantalla a coordenadas de la funcion de rastrigin
+
+el codigo utilizaba: 
+
+x = random(width);
+y = random(height);
+
+esto vivia con coordenadas de la pantalla
+
+pero la funcion de rastrigin esta definida en otros valores 
+
+pro lo tanto, se realiza un mapeo de escala
+
+map(valor, min1, max1, min2, max2)
+
+se agregan las lineas: 
+
+float rx = map(x,0,width,xmin,xmax);
+float ry = map(y,0,height,ymin,ymax);
+
+
+
+5) PARA QUE CUALQUIER EVALUACION INICIAL SEA MEJOR
+
+
+  gbest = Float.MAX_VALUE;
+
+
+
+6) reemplazar la evaluacion por la funcion
+
+La función recorre cada pixel de la ventana y calcula el valor de la función en ese punto.
+
+se agregan las lineas:
+
+
+void drawHeatMap(){
+  
+  // se cargan los píxeles de la pantalla
+  loadPixels();
+  
+  // se recorren las coordenadas en horizontal -->> i
+  for(int i=0;i<width;i++){
+    
+    // se recorren las coordenadas en vertical -->> j
+    for(int j=0;j<height;j++){
+      
+       // la funcion esta definida por x_i en [-3 , 7]
+      float x = map(i,0,width,xmin,xmax);
+      float y = map(j,0,height,ymin,ymax);
+      
+      // se evalúa la función rastrigin en ese punto
+      float v = rastrigin(x,y);
+      
+      // El valor de la función se convierte en un color
+      float col = map(v,0,80,0,255);
+      col = constrain(col,0,255);
+      
+      // Luego se asigna ese color al pixel (width = ancho de la pantalla)
+      pixels[j*width+i] = color(col,0,255-col);
+      
+    }
+  }
+
+
+TABLA DE COLORES POSIBLES DE LA FUNCION: 
+
+| valor de la función |	 color    |
+|---------------------|-----------|
+|       pequeña	      |  azul     |
+|       mediana       |  morado   |
+|       grande	      |  rojo     |
+
+
+
+7) FUNCIONES DE CONVERSION DE coordenadas
+
+float screenToDomainX(float x){
+  return map(x,0,width,xmin,xmax);
+}
+
+float screenToDomainY(float y){
+  return map(y,0,height,ymin,ymax);
+}
+
+estas funciones permiten convertir los pixeles al dominio matematico que nos entregan
+
+
+
+
+
+
+
+
